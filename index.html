@@ -18,11 +18,15 @@
 				Math.min(
 					Math.abs(
 						this.originY +
-						0.5 * this.originX -
-						time / 5 % window.innerWidth
+						0.5 * this.originX + 150 -
+						time / 5 %
+						(
+							Math.max(window.innerWidth, window.innerHeight)
+							+ 300
+						)
 					) / Math.sqrt(1.25)
-				, 100) / 100 * Math.PI / 2
-			) * 40;
+				, 200) / 200 * Math.PI / 2
+			) * 60;
 			if(!this.duration || time > this.start + this.duration) {
 				this.start = time;
 				this.duration = Math.random() * 1000 + 2000;
@@ -125,10 +129,10 @@
 		}
 
 		function generateTriangles() {
-			var originX = -100
-			  , originY = -100
-			  , width   = window.innerWidth + 100
-			  , height  = window.innerHeight + 100
+			var originX = -150
+			  , originY = -150
+			  , width   = window.innerWidth + 150
+			  , height  = window.innerHeight + 150
 			  , deltaX  = 80
 			  , deltaY  = 30
 			  , columns = Math.ceil(width / deltaX)
