@@ -1,1 +1,1 @@
-Hosted at spencerschack.com
+Hosted at http://spencerschack.com
