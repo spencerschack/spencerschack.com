@@ -12,6 +12,9 @@
 			this.width  = options.width  || 500;
 			this.height = options.height || 500;
 
+			this.diagonal = Math.sqrt(this.width * this.width +
+				this.height * this.height);
+
 			this.renderer = PIXI.autoDetectRenderer(this.width, this.height);
 			this.resizeCanvas();
 			document.body.appendChild(this.renderer.view);
@@ -86,7 +89,8 @@
 					}
 					triangles[i * columns * 2 + j] = new Waves.Triangle({
 						v0: v0, v1: v1, v2: v2,
-						graphics: this.graphics
+						graphics: this.graphics,
+						waves: this
 					});
 				}
 			}
@@ -166,6 +170,10 @@
 			this.v1 = options.v1;
 			this.v2 = options.v2;
 			this.graphics = options.graphics;
+			this.waves = options.waves;
+			var sumX = this.v0.originX + this.v1.originX + this.v2.originX
+			  , sumY = this.v0.originY + this.v1.originY + this.v2.originY;
+			this.centroid = new Waves.Vector({ x: sumX / 3, y: sumY / 3 });
 		}
 
 		Waves.Triangle.prototype.draw = function() {
@@ -186,7 +194,12 @@
 		}
 
 		Waves.Triangle.prototype.color = function() {
-			return Waves.hslToRgb((210 + this.area() / 100)/360, 0.5, 0.5);
+			var hue = 180, saturation = 0.5, lightness = 0.5;
+			var hue = 240 - (Math.abs(0.5 * this.centroid.x + this.centroid.y) /
+				Math.sqrt(1.25) / this.waves.diagonal) * 80
+			  , saturation = 0.5 + 0.02 * this.area() / 500
+			  , lightness = saturation;
+			return Waves.hslToRgb(hue / 360, saturation, lightness);
 		}
 
 		window.addEventListener("DOMContentLoaded", function() {
@@ -197,6 +210,8 @@
 			window.addEventListener("resize", function() {
 				waves.width  = window.innerWidth;
 				waves.height = window.innerHeight;
+				waves.diagonal = Math.sqrt(waves.width * waves.width +
+					waves.height * waves.height);
 				waves.resizeCanvas();
 			});
 		});
