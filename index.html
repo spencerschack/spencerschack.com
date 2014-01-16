@@ -135,8 +135,10 @@
 		Waves.Vector = function(options) {
 			this.originX = this.x = options.x || 0;
 			this.originY = this.y = options.y || 0;
-			this.deltaX = 0;
-			this.deltaY = 0;
+			this.deltaX = this.newDeltaX();
+			this.deltaY = this.newDeltaY();
+			this.duration = this.newDuration();
+			this.start = Date.now() - this.newDuration();
 		}
 
 		Waves.Vector.prototype.update = function(time) {
@@ -153,16 +155,28 @@
 					) / Math.sqrt(1.25)
 				, 200) / 200 * Math.PI / 2
 			) * 60;
-			if(!this.duration || time > this.start + this.duration) {
+			if(time > this.start + this.duration) {
 				this.start = time;
-				this.duration = Math.random() * 1000 + 2000;
-				this.deltaX = Math.random() * 20 - 10;
-				this.deltaY = Math.random() * 26 - 13;
+				this.duration = this.newDuration();
+				this.deltaX = this.newDeltaX();
+				this.deltaY = this.newDeltaY();
 			}
 			var delta = (time - this.start) / this.duration
 			  , sin   = Math.sin(delta * Math.PI * 2);
 			this.x = Math.round(this.originX + sin * this.deltaX);
 			this.y = Math.round(this.originY + sin * this.deltaY + distance);
+		}
+
+		Waves.Vector.prototype.newDuration = function() {
+			return Math.random() * 1000 + 2000;
+		}
+
+		Waves.Vector.prototype.newDeltaX = function() {
+			return Math.random() * 20 - 10
+		}
+
+		Waves.Vector.prototype.newDeltaY = function() {
+			return Math.random() * 26 - 13;
 		}
 
 		Waves.Triangle = function(options) {
@@ -197,8 +211,10 @@
 			var hue = 180, saturation = 0.5, lightness = 0.5;
 			var hue = 240 - (Math.abs(0.5 * this.centroid.x + this.centroid.y) /
 				Math.sqrt(1.25) / this.waves.diagonal) * 80
-			  , saturation = 0.5 + 0.02 * this.area() / 500
-			  , lightness = saturation;
+			  , area = this.area()
+			  , saturation = 0.6 + 0.02 * area / 500
+			  , lightness = Math.min(1, saturation +
+			  	0.1 * Math.pow(area / 2500, 10));
 			return Waves.hslToRgb(hue / 360, saturation, lightness);
 		}
 
